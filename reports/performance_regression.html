@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Performance Regression Analysis</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2 { color: #333; }
+        .summary { margin: 20px 0; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { padding: 8px; text-align: left; border: 1px solid #ddd; }
+        th { background-color: #4CAF50; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .regression { background-color: #FFCDD2; }
+        .improvement { background-color: #C8E6C9; }
+        .chart-container { margin: 20px 0; width: 800px; height: 400px; }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Performance Regression Analysis</h1>
+    <div class="summary">
+        <h2>Summary</h2>
+        <p>Total benchmarks tracked: 1</p>
+        <p>Total runs: 10</p>
+        <p>Regressions detected: 0</p>
+    </div>
+    <h2>Benchmark Results</h2>
+    <table>
+        <tr>
+            <th>Benchmark</th>
+            <th>Baseline Avg (ms)</th>
+            <th>Current Avg (ms)</th>
+            <th>Change (%)</th>
+            <th>Status</th>
+        </tr>
+        <tr class="normal">
+            <td>Trigonometry</td>
+            <td>0.00</td>
+            <td>0.00</td>
+            <td>-nan(ind)%</td>
+            <td>Stable</td>
+        </tr>
+    </table>
+    <h3>Benchmark: Trigonometry</h3>
+    <div class="chart-container">
+        <canvas id="chart_Trigonometry"></canvas>
+    </div>
+    <script>
+        new Chart(document.getElementById('chart_Trigonometry'), {
+            type: 'line',
+            data: {
+                labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+                datasets: [{
+                    label: 'Trigonometry Execution Time (ms)',
+                    data: [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+                    borderColor: '#4CAF50',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        title: { display: true, text: 'Time (ms)' },
+                        beginAtZero: true
+                    },
+                    x: {
+                        title: { display: true, text: 'Run' }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

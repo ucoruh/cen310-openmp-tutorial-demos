@@ -1,6 +1,6 @@
 # OpenMP Tutorial Demos
 
-This repository contains a collection of comprehensive OpenMP examples demonstrating various parallel programming concepts using C++ with Visual Studio 2022 on Windows 11. Each demo is a self-contained project with full CMake support, detailed documentation, and batch files for easy building and execution.
+This repository contains a collection of comprehensive OpenMP examples demonstrating various parallel programming concepts using C++ with Visual Studio 2022 on Windows. Each demo is a self-contained project with full CMake support, detailed documentation, and batch files for easy building and execution.
 
 ## Repository Structure
 
@@ -21,7 +21,7 @@ Each folder contains its own README with detailed explanations and instructions.
 
 ## Prerequisites
 
-- Windows 11
+- Windows 10/11
 - Visual Studio 2022 Community Edition
 - CMake 3.20 or higher
 - C++17 compatible compiler
@@ -39,8 +39,30 @@ To run any example:
 
 1. Navigate to the example directory
 2. Run `configure.bat` to set up the CMake project
-3. Run `build.bat` to compile the example
-4. Run `run.bat` to execute the example
+3. Run `build_all.bat` to compile the example in all configurations
+4. Run `run.bat` to execute the example with default settings
+
+### Improved Script System
+
+The projects now use a unified script system for easier usage:
+
+- `configure.bat` - Sets up the CMake project (run once)
+- `build_all.bat` - Builds Debug, Release, and Profile configurations
+- `clean.bat` - Removes build files for a fresh start
+- `run.bat` - Unified script with multiple options:
+  - `--debug`, `--release`, `--profile` - Select build configuration
+  - `--verbose`, `--quick`, `--benchmark` - Run mode options
+  - `--threads N` - Set number of OpenMP threads
+  - `--example NAME` - Run specific example
+  - `--help` - Show all available options
+- `run_all.bat` - Runs examples in different configurations sequentially
+
+Example usages:
+```
+run.bat --debug --verbose
+run.bat --release --benchmark --threads 8
+run.bat --example race_conditions
+```
 
 ## Learning Path
 

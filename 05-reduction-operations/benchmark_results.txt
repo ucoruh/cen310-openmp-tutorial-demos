@@ -1,0 +1,52 @@
+OpenMP Reduction Operations - Benchmark Results
+=================================================
+Threads available: 4
+
+Data size: 10000
+--------------------
+Product Operation (specialized data):
+  Sequential:  0.1 ms
+  Reduction:   0.1 ms (Speedup: 1x)
+
+Sum Operation:
+  Sequential:  0.10 ms
+  Critical:    1.00 ms (Speedup: 0.10x)
+  Atomic:      0.10 ms (Speedup: 1.00x)
+  Manual:      0.10 ms (Speedup: 1.00x)
+  Reduction:   0.10 ms (Speedup: 1.00x)
+
+Data size: 100000
+--------------------
+Product Operation (specialized data):
+  Sequential:  0.10 ms
+  Reduction:   0.10 ms (Speedup: 1.00x)
+
+Sum Operation:
+  Sequential:  0.10 ms
+  Critical:    9.00 ms (Speedup: 0.01x)
+  Atomic:      1.00 ms (Speedup: 0.10x)
+  Manual:      0.10 ms (Speedup: 1.00x)
+  Reduction:   0.10 ms (Speedup: 1.00x)
+
+Data size: 1000000
+--------------------
+Product Operation (specialized data):
+  Sequential:  1.00 ms
+  Reduction:   0.10 ms (Speedup: 10.00x)
+
+Sum Operation:
+  Sequential:  1.00 ms
+  Critical:    114.00 ms (Speedup: 0.01x)
+  Atomic:      18.00 ms (Speedup: 0.06x)
+  Manual:      0.10 ms (Speedup: 10.00x)
+  Reduction:   0.10 ms (Speedup: 10.00x)
+
+Data size: 10000000
+--------------------
+Sum Operation:
+  Sequential:  7.00 ms
+  Critical:    993.00 ms (Speedup: 0.01x)
+  Atomic:      204.00 ms (Speedup: 0.03x)
+  Manual:      2.00 ms (Speedup: 3.50x)
+  Reduction:   2.00 ms (Speedup: 3.50x)
+

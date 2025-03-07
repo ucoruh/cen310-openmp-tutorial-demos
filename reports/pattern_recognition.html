@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OpenMP Pattern Recognition Report</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2 { color: #333; }
+        .summary { margin: 20px 0; }
+        table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+        th, td { padding: 8px; text-align: left; border: 1px solid #ddd; }
+        th { background-color: #4CAF50; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        .high { background-color: #FFCDD2; }
+        .medium { background-color: #FFF9C4; }
+        .low { background-color: #C8E6C9; }
+    </style>
+</head>
+<body>
+    <h1>OpenMP Pattern Recognition Report</h1>
+    <div class="summary">
+        <h2>Summary</h2>
+        <p>Total patterns analyzed: 2</p>
+    </div>
+    <h2>Detected Patterns</h2>
+    <table>
+        <tr>
+            <th>Pattern Type</th>
+            <th>Description</th>
+            <th>Confidence</th>
+            <th>Recommendation</th>
+        </tr>
+        <tr class="medium">
+            <td>Load Imbalance</td>
+            <td>Thread execution times vary significantly, indicating load imbalance</td>
+            <td>61.11%</td>
+            <td>Consider using dynamic scheduling or manually balancing workload</td>
+        </tr>
+        <tr class="high">
+            <td>Excessive Synchronization</td>
+            <td>High frequency of synchronization operations detected</td>
+            <td>100.00%</td>
+            <td>Reduce barriers/critical sections or reorganize algorithm to require less synchronization</td>
+        </tr>
+    </table>
+    <h2>OpenMP Best Practices</h2>
+    <ul>
+        <li><strong>Race Conditions:</strong> Protect shared variables with critical sections, atomic operations, or locks</li>
+        <li><strong>False Sharing:</strong> Align data to cache lines and add padding between thread-local data</li>
+        <li><strong>Load Imbalance:</strong> Use dynamic or guided scheduling for uneven workloads</li>
+        <li><strong>Synchronization:</strong> Minimize barriers and critical sections for better scalability</li>
+        <li><strong>Memory:</strong> Be aware of NUMA effects and organize data for better locality</li>
+    </ul>
+</body>
+</html>

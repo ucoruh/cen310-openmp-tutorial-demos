@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenMP Thread Timeline Visualization</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .timeline-container { margin-top: 20px; }
+        .thread-row { height: 40px; margin-bottom: 5px; position: relative; }
+        .thread-label { position: absolute; left: 0; width: 80px; height: 40px; }
+        .timeline { position: absolute; left: 100px; right: 0; height: 40px; }
+        .timeline-scale { height: 20px; border-bottom: 1px solid #ccc; position: relative; margin-bottom: 10px; margin-left: 100px; }
+        .timeline-marker { position: absolute; width: 1px; height: 5px; background: #888; bottom: 0; }
+        .timeline-marker-label { position: absolute; font-size: 10px; color: #888; }
+        .event { position: absolute; height: 30px; border-radius: 4px; top: 5px; }
+        .event-start { background-color: #4CAF50; }
+        .event-end { background-color: #F44336; }
+        .event-sync { background-color: #FF9800; }
+        .event-idle { background-color: #BDBDBD; }
+        .event-work { background-color: #2196F3; }
+        .tooltip { display: none; position: absolute; background: #333; color: #fff; padding: 5px; border-radius: 3px; z-index: 100; font-size: 12px; }
+        h1 { color: #333; }
+        .summary { margin: 20px 0; }
+        .legend { display: flex; margin-top: 20px; }
+        .legend-item { display: flex; align-items: center; margin-right: 20px; }
+        .legend-color { width: 20px; height: 20px; margin-right: 5px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>OpenMP Thread Timeline Visualization</h1>
+    <div class="summary">
+        <p>Total execution time: 468 ms</p>
+        <p>Number of threads: 4</p>
+    </div>
+    <div class="timeline-scale">
+        <div class="timeline-marker" style="left: 0%;"></div>
+        <div class="timeline-marker-label" style="left: 0%">0 ms</div>
+        <div class="timeline-marker" style="left: 21.3675%;"></div>
+        <div class="timeline-marker-label" style="left: 21.3675%">100 ms</div>
+        <div class="timeline-marker" style="left: 42.735%;"></div>
+        <div class="timeline-marker-label" style="left: 42.735%">200 ms</div>
+        <div class="timeline-marker" style="left: 64.1026%;"></div>
+        <div class="timeline-marker-label" style="left: 64.1026%">300 ms</div>
+        <div class="timeline-marker" style="left: 85.4701%;"></div>
+        <div class="timeline-marker-label" style="left: 85.4701%">400 ms</div>
+    </div>
+    <div class="timeline-container">
+        <div class="thread-row">
+            <div class="thread-label">Thread 0</div>
+            <div class="timeline">
+                <div class="event event-start" style="left: 0.641026%; width: 0.5%;" onmouseover="showTooltip(event, 'Starting parallel region (0 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-start" style="left: 0.641026%; width: 0.5%;" onmouseover="showTooltip(event, 'Thread started (0 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 23.7179%; width: 22.8632%;" onmouseover="showTooltip(event, 'Initial work (107 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-sync" style="left: 23.7179%; width: 0.5%;" onmouseover="showTooltip(event, 'Barrier synchronization (0 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-idle" style="left: 46.7949%; width: 22.8632%;" onmouseover="showTooltip(event, 'Waiting for work (107 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 53.6325%; width: 6.62393%;" onmouseover="showTooltip(event, 'Task 11 execution (31 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 60.4701%; width: 6.83761%;" onmouseover="showTooltip(event, 'Task 14 execution (32 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 67.094%; width: 6.41026%;" onmouseover="showTooltip(event, 'Task 19 execution (30 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 76.9231%; width: 9.82906%;" onmouseover="showTooltip(event, 'Task 24 execution (46 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 86.7521%; width: 9.82906%;" onmouseover="showTooltip(event, 'Task 27 execution (46 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 89.9573%; width: 2.99145%;" onmouseover="showTooltip(event, 'Task 32 execution (14 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 93.3761%; width: 3.20513%;" onmouseover="showTooltip(event, 'Task 35 execution (15 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 99.7863%; width: 6.41026%;" onmouseover="showTooltip(event, 'Task 39 execution (30 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-end" style="left: 99.7863%; width: 0.5%;" onmouseover="showTooltip(event, 'Thread completed (0 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-end" style="left: 100%; width: 0.5%;" onmouseover="showTooltip(event, 'Parallel region completed (0 ms)')" onmouseout="hideTooltip()"></div>
+            </div>
+        </div>
+        <div class="thread-row">
+            <div class="thread-label">Thread 1</div>
+            <div class="timeline">
+                <div class="event event-start" style="left: 0.854701%; width: 0.5%;" onmouseover="showTooltip(event, 'Thread started (0 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 13.6752%; width: 12.8205%;" onmouseover="showTooltip(event, 'Initial work (60 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-sync" style="left: 23.7179%; width: 0.5%;" onmouseover="showTooltip(event, 'Barrier synchronization (0 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 27.1368%; width: 3.20513%;" onmouseover="showTooltip(event, 'Task 0 execution (15 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 30.3419%; width: 2.99145%;" onmouseover="showTooltip(event, 'Task 2 execution (14 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 33.7607%; width: 3.20513%;" onmouseover="showTooltip(event, 'Task 5 execution (15 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 40.3846%; width: 6.41026%;" onmouseover="showTooltip(event, 'Task 7 execution (30 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 46.7949%; width: 6.41026%;" onmouseover="showTooltip(event, 'Task 8 execution (30 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 53.6325%; width: 6.83761%;" onmouseover="showTooltip(event, 'Task 10 execution (32 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 60.4701%; width: 6.62393%;" onmouseover="showTooltip(event, 'Task 17 execution (31 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 67.094%; width: 6.41026%;" onmouseover="showTooltip(event, 'Task 20 execution (30 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 76.9231%; width: 9.82906%;" onmouseover="showTooltip(event, 'Task 22 execution (46 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 86.7521%; width: 9.61538%;" onmouseover="showTooltip(event, 'Task 28 execution (45 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 89.9573%; width: 3.20513%;" onmouseover="showTooltip(event, 'Task 30 execution (15 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 93.3761%; width: 3.20513%;" onmouseover="showTooltip(event, 'Task 34 execution (15 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 99.7863%; width: 6.41026%;" onmouseover="showTooltip(event, 'Task 38 execution (30 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-end" style="left: 100%; width: 0.5%;" onmouseover="showTooltip(event, 'Thread completed (0 ms)')" onmouseout="hideTooltip()"></div>
+            </div>
+        </div>
+        <div class="thread-row">
+            <div class="thread-label">Thread 2</div>
+            <div class="timeline">
+                <div class="event event-start" style="left: 0.854701%; width: 0.5%;" onmouseover="showTooltip(event, 'Thread started (0 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 20.2991%; width: 19.4444%;" onmouseover="showTooltip(event, 'Initial work (91 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-sync" style="left: 23.7179%; width: 0.5%;" onmouseover="showTooltip(event, 'Barrier synchronization (0 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-idle" style="left: 46.7949%; width: 22.8632%;" onmouseover="showTooltip(event, 'Waiting for work (107 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 53.6325%; width: 6.62393%;" onmouseover="showTooltip(event, 'Task 12 execution (31 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 60.4701%; width: 6.62393%;" onmouseover="showTooltip(event, 'Task 15 execution (31 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 67.094%; width: 6.41026%;" onmouseover="showTooltip(event, 'Task 18 execution (30 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 76.9231%; width: 9.61538%;" onmouseover="showTooltip(event, 'Task 23 execution (45 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 86.7521%; width: 9.82906%;" onmouseover="showTooltip(event, 'Task 26 execution (46 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 89.9573%; width: 3.20513%;" onmouseover="showTooltip(event, 'Task 31 execution (15 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 96.5812%; width: 6.62393%;" onmouseover="showTooltip(event, 'Task 36 execution (31 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-end" style="left: 99.7863%; width: 0.5%;" onmouseover="showTooltip(event, 'Thread completed (0 ms)')" onmouseout="hideTooltip()"></div>
+            </div>
+        </div>
+        <div class="thread-row">
+            <div class="thread-label">Thread 3</div>
+            <div class="timeline">
+                <div class="event event-start" style="left: 0.854701%; width: 0.5%;" onmouseover="showTooltip(event, 'Thread started (0 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 10.4701%; width: 9.40171%;" onmouseover="showTooltip(event, 'Initial work (44 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-sync" style="left: 23.7179%; width: 0.5%;" onmouseover="showTooltip(event, 'Barrier synchronization (0 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 27.1368%; width: 3.20513%;" onmouseover="showTooltip(event, 'Task 1 execution (15 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 30.3419%; width: 2.99145%;" onmouseover="showTooltip(event, 'Task 3 execution (14 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 33.7607%; width: 3.20513%;" onmouseover="showTooltip(event, 'Task 4 execution (15 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 40.3846%; width: 6.41026%;" onmouseover="showTooltip(event, 'Task 6 execution (30 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 46.7949%; width: 6.41026%;" onmouseover="showTooltip(event, 'Task 9 execution (30 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 53.6325%; width: 6.62393%;" onmouseover="showTooltip(event, 'Task 13 execution (31 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 60.4701%; width: 6.62393%;" onmouseover="showTooltip(event, 'Task 16 execution (31 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 70.2991%; width: 9.61538%;" onmouseover="showTooltip(event, 'Task 21 execution (45 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 80.3419%; width: 9.82906%;" onmouseover="showTooltip(event, 'Task 25 execution (46 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 89.9573%; width: 9.61538%;" onmouseover="showTooltip(event, 'Task 29 execution (45 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 93.3761%; width: 3.20513%;" onmouseover="showTooltip(event, 'Task 33 execution (15 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-work" style="left: 99.7863%; width: 6.41026%;" onmouseover="showTooltip(event, 'Task 37 execution (30 ms)')" onmouseout="hideTooltip()"></div>
+                <div class="event event-end" style="left: 100%; width: 0.5%;" onmouseover="showTooltip(event, 'Thread completed (0 ms)')" onmouseout="hideTooltip()"></div>
+            </div>
+        </div>
+    </div>
+    <div class="legend">
+        <div class="legend-item"><div class="legend-color event-start"></div>Start</div>
+        <div class="legend-item"><div class="legend-color event-end"></div>End</div>
+        <div class="legend-item"><div class="legend-color event-sync"></div>Synchronization</div>
+        <div class="legend-item"><div class="legend-color event-idle"></div>Idle</div>
+        <div class="legend-item"><div class="legend-color event-work"></div>Work</div>
+    </div>
+    <div class="tooltip" id="tooltip"></div>
+    <script>
+        function showTooltip(event, text) {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.innerHTML = text;
+            tooltip.style.display = 'block';
+            tooltip.style.left = (event.pageX + 10) + 'px';
+            tooltip.style.top = (event.pageY + 10) + 'px';
+        }
+        function hideTooltip() {
+            document.getElementById('tooltip').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
