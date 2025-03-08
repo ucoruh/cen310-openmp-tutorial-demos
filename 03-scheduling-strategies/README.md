@@ -1,8 +1,8 @@
-# OpenMP Scheduling Strategies Demo
+# ⚖️ OpenMP Scheduling Strategies
 
 This project demonstrates different OpenMP scheduling strategies and their impact on performance, load balancing, and thread utilization when applied to non-uniform workloads.
 
-## Overview
+## 🎯 Overview
 
 OpenMP provides several scheduling strategies to distribute loop iterations among threads, each with distinct advantages for different workload types:
 
@@ -13,11 +13,121 @@ OpenMP provides several scheduling strategies to distribute loop iterations amon
 | **Guided** | Similar to dynamic but with decreasing chunk sizes | Mixed workloads |
 | **Auto** | Runtime system selects the scheduling method | Unknown characteristics |
 
-This demo visualizes and compares these strategies across several key performance metrics:
-- Execution time and speedup vs. sequential code
-- Load balancing across available threads
-- Thread utilization patterns
-- Iteration distribution visualization
+## 📊 OpenMP Scheduling Strategies
+
+The following diagram illustrates how different OpenMP scheduling strategies distribute iterations among threads:
+
+![OpenMP Scheduling Strategies](./assets/scheduling_strategies.png)
+
+## 🧩 Scheduling Clauses in OpenMP
+
+```cpp
+// Static scheduling: equal chunks pre-assigned to threads
+#pragma omp parallel for schedule(static)
+for (int i = 0; i < N; i++) {
+    process(i);
+}
+
+// Static scheduling with custom chunk size
+#pragma omp parallel for schedule(static, 4)
+for (int i = 0; i < N; i++) {
+    process(i);
+}
+
+// Dynamic scheduling: on-demand distribution
+#pragma omp parallel for schedule(dynamic)
+for (int i = 0; i < N; i++) {
+    process(i);
+}
+
+// Dynamic scheduling with custom chunk size
+#pragma omp parallel for schedule(dynamic, 4)
+for (int i = 0; i < N; i++) {
+    process(i);
+}
+
+// Guided scheduling: decreasing chunk sizes
+#pragma omp parallel for schedule(guided)
+for (int i = 0; i < N; i++) {
+    process(i);
+}
+
+// Auto scheduling: implementation decides
+#pragma omp parallel for schedule(auto)
+for (int i = 0; i < N; i++) {
+    process(i);
+}
+
+// Runtime scheduling: determined by environment variable
+// export OMP_SCHEDULE="dynamic,4"
+#pragma omp parallel for schedule(runtime)
+for (int i = 0; i < N; i++) {
+    process(i);
+}
+```
+
+## 💻 Examples in This Project
+
+This project includes the following examples:
+
+1. **Static Scheduling**: Demonstrates the default block distribution and chunk-based variations
+2. **Dynamic Scheduling**: Shows on-demand iteration assignment for better load balancing
+3. **Guided Scheduling**: Illustrates the benefits of decreasing chunk sizes
+4. **Auto & Runtime Scheduling**: Provides flexibility without code changes
+5. **Non-uniform Workload**: Creates workload with varying computation times per iteration
+
+## 📈 Performance Considerations
+
+1. **Static Scheduling**: 
+   - Lowest scheduling overhead
+   - Best for evenly distributed workload
+   - Poor performance with irregular computation
+
+2. **Dynamic Scheduling**:
+   - Higher scheduling overhead
+   - Excellent load balancing for irregular workloads
+   - Small chunk sizes increase overhead but improve balancing
+
+3. **Guided Scheduling**:
+   - Moderate overhead
+   - Good compromise between static and dynamic
+   - Handles moderately irregular workloads well
+
+4. **Auto & Runtime**:
+   - Flexibility without recompilation
+   - Useful for tuning without code changes
+   - Implementation-dependent behavior
+
+## 🚀 Running the Examples
+
+Use the provided scripts to configure, build, and run the examples:
+
+1. Run `configure.bat` to set up the CMake project
+2. Run `build_all.bat` to compile all examples
+3. Run `run.bat` to execute the examples
+
+Example usage:
+
+```bash
+run.bat                          # Run with default settings (Release mode)
+run.bat --debug                  # Run in Debug mode with additional diagnostics
+run.bat --release                # Run in Release mode (optimized performance)
+run.bat --threads 8              # Run with 8 threads
+run.bat --schedule dynamic       # Use dynamic scheduling strategy
+run.bat --verbose                # Run with verbose output
+```
+
+For the most comprehensive experience, you can use:
+
+```bash
+run_all.bat                      # Run all demonstrations in sequence
+```
+
+## 📚 Additional Resources
+
+- [OpenMP Scheduling Constructs](https://www.openmp.org/spec-html/5.0/openmpsu42.html)
+- [Loop Scheduling Performance Guide](https://www.openmp.org/wp-content/uploads/openmp-examples-4.5.0.pdf)
+- See the accompanying `SCHEDULING.md` for detailed explanations of each scheduling strategy
 
 ## Prerequisites
 
@@ -53,14 +163,6 @@ run.bat --verbose                # Run with verbose output
 run.bat --help                   # Show all available options
 ```
 
-For the most comprehensive experience, you can use:
-
-```
-run_all.bat                      # Run all demonstrations in sequence
-```
-
-This will execute all scheduling strategies with various thread counts and performance comparisons.
-
 For specific scheduling strategy comparisons, we also provide:
 
 ```
@@ -80,42 +182,6 @@ clean.bat
 ```
 
 This will remove all build artifacts and temporary files.
-
-## Program Workflow
-
-1. **Workload Generation**:
-   - Creates a synthetic workload of computing prime numbers with varying computational intensity
-   - Ensures non-uniform task distribution to highlight scheduling differences
-
-2. **Execution and Measurement**:
-   - Sequential execution (baseline)
-   - Parallel execution with multiple scheduling strategies:
-     - Static (default and with chunk sizes)
-     - Dynamic (default and with chunk sizes)
-     - Guided (default and with chunk sizes)
-     - Runtime scheduling
-
-3. **Performance Analysis**:
-   - Measures execution time for each strategy
-   - Calculates speedup relative to sequential execution
-   - Analyzes load distribution among threads
-   - Determines optimal scheduling for the workload
-
-4. **Visualization**:
-   - Displays formatted performance summary
-   - Visualizes thread work distribution
-   - Shows iteration assignment patterns for each strategy
-
-## Code Components
-
-- `src/main.cpp` - Main implementation with all scheduling strategies
-- `CMakeLists.txt` - CMake configuration for building the project
-- Batch files:
-  - `configure.bat` - Sets up the CMake project
-  - `build_all.bat` - Builds Debug, Release, and Profile configurations
-  - `run.bat` - Unified script for running the program with various options
-  - `run_all.bat` - Runs all scheduling strategies with various thread counts
-  - `clean.bat` - Removes build artifacts
 
 ## Scheduling Strategy Visualization
 
@@ -157,38 +223,6 @@ These visualizations help understand how different scheduling strategies assign 
   - Verify CMake 3.20+ is installed and in your PATH
   - Run the batch files from a Visual Studio Developer Command Prompt
 
-### Runtime Issues
-- If the executable fails to launch:
-  - Check that the build completed successfully
-  - Verify the executable path in the run scripts matches your build output
-  - Ensure OpenMP runtime libraries are available
-
-## Advanced Usage
-
-### Modifying Workload Parameters
-You can adjust these parameters in `main.cpp`:
-- `NUM_WORKLOAD_ITEMS` - Number of tasks/iterations to process
-- `MAX_NUMBER` - Upper limit for prime calculation workload
-- Chunk sizes for different scheduling strategies
-
-### Experimenting with Custom Schedules
-Add new scheduling configurations by:
-1. Adding new `SchedulingResult` instances in the main function
-2. Implementing additional `#pragma omp` schedules with custom parameters
-3. Adding the results to the performance comparison table
-
-### Advanced Analysis
-For deeper understanding of scheduling behavior:
-1. Modify the code to export timing data to CSV
-2. Add variance calculations across multiple runs
-3. Implement more complex visualizations of thread behavior
-
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Additional Resources
-
-- [OpenMP Documentation](https://www.openmp.org/resources/)
-- [OpenMP 5.1 Specification](https://www.openmp.org/spec-html/5.1/openmp.html)
-- See the accompanying `SCHEDULING.md` for detailed explanations of each scheduling strategy 
+This project is licensed under the MIT License - see the LICENSE file for details. 

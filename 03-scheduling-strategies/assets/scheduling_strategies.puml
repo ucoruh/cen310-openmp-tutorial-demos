@@ -1,0 +1,114 @@
+@startuml scheduling_strategies
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 12
+skinparam BackgroundColor #FFFFFF
+skinparam TitleFontSize 18
+skinparam ArrowColor #000000
+skinparam ArrowThickness 1.5
+skinparam ActivityBackgroundColor #E6F2FF
+skinparam ActivityBorderColor #0066CC
+skinparam ActivityBorderThickness 1.5
+skinparam NoteBackgroundColor #FFF8DC
+skinparam NoteBorderColor #DAA520
+skinparam NoteBorderThickness 1.5
+skinparam RectangleBackgroundColor #E6F2FF
+skinparam RectangleBorderColor #0066CC
+skinparam RectangleBorderThickness 1.5
+skinparam PartitionBackgroundColor #F0F0F0
+skinparam PartitionBorderColor #666666
+skinparam PartitionBorderThickness 1.5
+
+title OpenMP Scheduling Strategies
+
+rectangle "for loop: Iterations: 0 1 2 3 4 5 6 7 8 9 10 11" as iterations
+
+package "Static (Default)" {
+    rectangle "Thread 0: Iterations 0, 1, 2" as t0s #D4F1F9
+    rectangle "Thread 1: Iterations 3, 4, 5" as t1s #D4F9D4
+    rectangle "Thread 2: Iterations 6, 7, 8" as t2s #F9D4D4
+    rectangle "Thread 3: Iterations 9, 10, 11" as t3s #F1F9D4
+    
+    note bottom of t3s
+      **#pragma omp for schedule(static)**
+      Each thread gets N/P iterations in contiguous chunks
+      where N = iteration count, P = number of threads
+    end note
+}
+
+package "Static with Chunk Size" {
+    rectangle "Thread 0: Iterations 0, 1, 4, 5, 8, 9" as t0sc #D4F1F9
+    rectangle "Thread 1: Iterations 2, 3, 6, 7, 10, 11" as t1sc #D4F9D4
+    rectangle "Thread 2: (No iterations assigned)" as t2sc #F9D4D4
+    rectangle "Thread 3: (No iterations assigned)" as t3sc #F1F9D4
+    
+    note bottom of t3sc
+      **#pragma omp for schedule(static, 2)**
+      Iterations distributed in round-robin chunks
+      of size 2
+    end note
+}
+
+package "Dynamic" {
+    rectangle "Thread 0: Iterations 0, 1, 2, 6, 7, 8" as t0d #D4F1F9
+    rectangle "Thread 1: Iterations 3, 4, 5, 9, 10, 11" as t1d #D4F9D4
+    rectangle "Thread 2: (No iterations assigned)" as t2d #F9D4D4
+    rectangle "Thread 3: (No iterations assigned)" as t3d #F1F9D4
+    
+    note bottom of t3d
+      **#pragma omp for schedule(dynamic, 3)**
+      Threads get 3 iterations at a time
+      when they finish their previous work.
+      Fast threads get more iterations.
+    end note
+}
+
+package "Guided" {
+    rectangle "Thread 0: Iterations 0, 1, 2, 3, 4, 10, 11" as t0g #D4F1F9
+    rectangle "Thread 1: Iterations 5, 6, 7, 8, 9" as t1g #D4F9D4
+    rectangle "Thread 2: (No iterations assigned)" as t2g #F9D4D4
+    rectangle "Thread 3: (No iterations assigned)" as t3g #F1F9D4
+    
+    note bottom of t3g
+      **#pragma omp for schedule(guided)**
+      Thread gets decreasing chunk sizes
+      starting with large chunks.
+      Minimum chunk size of 1 by default.
+    end note
+}
+
+package "Auto" {
+    rectangle "Thread 0: Implementation defined" as t0a #D4F1F9
+    rectangle "Thread 1: Implementation defined" as t1a #D4F9D4
+    rectangle "Thread 2: Implementation defined" as t2a #F9D4D4
+    rectangle "Thread 3: Implementation defined" as t3a #F1F9D4
+    
+    note bottom of t3a
+      **#pragma omp for schedule(auto)**
+      Scheduling is delegated to compiler/runtime
+      to choose the best strategy
+    end note
+}
+
+package "Runtime" {
+    rectangle "Thread 0: Determined at runtime" as t0r #D4F1F9
+    rectangle "Thread 1: Determined at runtime" as t1r #D4F9D4
+    rectangle "Thread 2: Determined at runtime" as t2r #F9D4D4
+    rectangle "Thread 3: Determined at runtime" as t3r #F1F9D4
+    
+    note bottom of t3r
+      **#pragma omp for schedule(runtime)**
+      Use OMP_SCHEDULE environment variable
+      to specify scheduling at runtime
+    end note
+}
+
+note bottom
+  **Scheduling Strategy Selection Factors:**
+  - **Static**: Best for evenly distributed workload with predictable iteration costs
+  - **Dynamic**: Best for uneven workloads or when iteration costs vary significantly
+  - **Guided**: Good for reducing scheduling overhead while handling imbalanced loads
+  - **Auto**: Let the system choose based on its own heuristics
+  - **Runtime**: Tune scheduling without recompiling
+end note
+
+@enduml 
