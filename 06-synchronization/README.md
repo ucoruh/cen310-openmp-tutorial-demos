@@ -1,74 +1,162 @@
-# OpenMP Synchronization Mechanisms
+# 🔒 OpenMP Synchronization
 
-This project demonstrates various synchronization mechanisms available in OpenMP, a parallel programming API for C/C++. Proper synchronization is essential for correct and efficient parallel programs to avoid race conditions and ensure proper coordination between threads.
+This project demonstrates various OpenMP synchronization mechanisms and their performance implications.
 
-## Overview
+## 🎯 Overview
 
-Parallel programming introduces challenges when multiple threads access shared resources simultaneously. OpenMP provides several synchronization constructs to coordinate thread execution and protect shared data. This project includes comprehensive examples and benchmarks for each synchronization mechanism.
+In parallel programming, synchronization mechanisms are essential to coordinate thread activities and protect shared resources. OpenMP provides several synchronization constructs to prevent data races and ensure correct execution order.
 
-## Synchronization Mechanisms Covered
+## 📊 OpenMP Synchronization Mechanisms
 
-### 1. Race Conditions
+The following diagram illustrates the key synchronization mechanisms in OpenMP:
 
-Race conditions occur when multiple threads access and modify shared data without proper synchronization. The examples demonstrate:
-- Counter race conditions
-- Array update race conditions  
-- Sum reduction race conditions
+![OpenMP Synchronization](./assets/openmp_synchronization.png)
 
-### 2. Critical Sections
+## 🧩 Key Synchronization Constructs
 
-Critical sections ensure exclusive access to shared resources. Examples include:
-- Basic critical sections
-- Named critical sections for fine-grained control
-- Nested critical sections
-- Performance impact analysis
+### 1. `#pragma omp barrier`
 
-### 3. Atomic Operations
+Forces all threads to wait until everyone reaches this point, ensuring threads are synchronized before proceeding.
 
-Atomic operations provide lightweight synchronization for simple operations. Examples include:
-- Different atomic operations (update, read, write, capture)
-- Performance comparison with critical sections
+```cpp
+#pragma omp parallel
+{
+    // Do some work
+    
+    #pragma omp barrier
+    
+    // All threads continue together from here
+}
+```
 
-### 4. Locks
+### 2. `#pragma omp critical`
 
-OpenMP provides more flexible lock mechanisms than critical sections. Examples include:
-- Simple locks (omp_set_lock, omp_unset_lock)
-- Nested locks (omp_set_nest_lock, omp_unset_nest_lock)
-- Lock hints for performance optimization
-- Implementing reader-writer locks
+Ensures that only one thread executes the enclosed block at a time, protecting shared resources from concurrent access.
 
-### 5. Barriers
+```cpp
+int sum = 0;
+#pragma omp parallel
+{
+    int local_result = compute_something();
+    
+    #pragma omp critical
+    {
+        sum += local_result;  // Only one thread can update sum at a time
+    }
+}
+```
 
-Barriers synchronize all threads at specific points. Examples include:
-- Implicit barriers (at the end of parallel regions and worksharing constructs)
-- Explicit barriers (#pragma omp barrier)
-- Performance impact of barriers
+### 3. `#pragma omp atomic`
 
-### 6. Ordered Construct
+Provides lightweight protection for simple updates to shared variables. More efficient than critical sections for basic operations.
 
-The ordered construct ensures sequential execution within a parallel loop. Examples include:
-- Basic ordered execution
-- Performance comparison with unordered execution
+```cpp
+int counter = 0;
+#pragma omp parallel for
+for (int i = 0; i < 1000; i++) {
+    #pragma omp atomic
+    counter++;  // Atomic increment, no race condition
+}
+```
 
-### 7. Master and Single Constructs
+### 4. `#pragma omp ordered`
 
-These constructs restrict execution to one thread. Examples include:
-- Master construct (executed only by the master thread)
-- Single construct (executed by exactly one thread)
-- Performance comparison
+Ensures that a block of code is executed in the same order as the sequential loop would have done.
 
-### 8. Flush Directive
+```cpp
+#pragma omp parallel for ordered
+for (int i = 0; i < 10; i++) {
+    // Parallel work here
+    
+    #pragma omp ordered
+    {
+        cout << "Iteration " << i << endl;  // Will print in order: 0, 1, 2, ...
+    }
+}
+```
 
-The flush directive ensures memory consistency. Examples include:
-- Memory consistency examples
-- Visualization of memory state
+### 5. `#pragma omp flush`
 
-## Performance Analysis
+Ensures all threads have a consistent view of memory by forcing any stored values to be written back to memory.
 
-The project includes comprehensive performance analysis tools:
-- Overhead measurement for each synchronization mechanism
-- Scalability analysis with different thread counts
-- Visualization of lock contention and thread activity
+```cpp
+bool flag = false;
+#pragma omp parallel sections
+{
+    #pragma omp section
+    {
+        // Thread 1 work
+        flag = true;
+        #pragma omp flush(flag)  // Make sure flag is visible to other threads
+    }
+    
+    #pragma omp section
+    {
+        // Thread 2 work
+        #pragma omp flush(flag)  // Read the updated value of flag
+        if (flag) { /* react to flag */ }
+    }
+}
+```
+
+### 6. Locks
+
+OpenMP provides explicit lock routines for more complex synchronization needs:
+
+```cpp
+omp_lock_t my_lock;
+omp_init_lock(&my_lock);
+
+#pragma omp parallel
+{
+    // Do some work
+    
+    omp_set_lock(&my_lock);
+    // Critical section here
+    omp_unset_lock(&my_lock);
+    
+    // More work
+}
+
+omp_destroy_lock(&my_lock);
+```
+
+## 💻 Examples in This Project
+
+This project includes the following examples:
+
+1. **Basic Synchronization**: Demonstrates barriers, critical sections, and atomic operations
+2. **Lock Performance**: Compares different lock types (simple, nested, read/write)
+3. **False Sharing**: Shows how thread synchronization can lead to false sharing
+4. **Ordered Execution**: Demonstrates the ordered construct for sequential ordering
+
+## 📈 Performance Considerations
+
+1. **Synchronization Overhead**: All synchronization introduces some overhead
+2. **Granularity**: Coarse-grained (less frequent) synchronization generally performs better than fine-grained
+3. **Critical vs. Atomic**: Atomic operations are lighter weight for simple operations
+4. **Lock Contention**: High contention for locks can significantly reduce performance
+5. **Barrier Costs**: Barriers force all threads to wait for the slowest thread
+
+## 🚀 Running the Examples
+
+Use the provided scripts to configure, build, and run the examples:
+
+1. Run `configure.bat` to set up the CMake project
+2. Run `build_all.bat` to compile all examples
+3. Run `run.bat` to execute the examples
+
+Example usage:
+
+```bash
+run.bat --debug --example lock_comparison
+```
+
+## 📚 Additional Resources
+
+- [OpenMP Synchronization Constructs](https://www.openmp.org/spec-html/5.0/openmpsu45.html)
+- [OpenMP Lock Routines](https://www.openmp.org/spec-html/5.0/openmpsu96.html)
+- [Performance Guide for OpenMP Synchronization](https://www.openmp.org/wp-content/uploads/openmp-examples-4.5.0.pdf)
 
 ## Prerequisites
 

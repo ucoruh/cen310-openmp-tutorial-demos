@@ -1,0 +1,96 @@
+@startuml openmp_data_sharing
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 12
+skinparam BackgroundColor #FFFFFF
+skinparam TitleFontSize 18
+skinparam ArrowColor #000000
+skinparam ArrowThickness 1.5
+skinparam PackageBackgroundColor #E8F4F9
+skinparam PackageBorderColor #0066CC
+skinparam PackageBorderThickness 1.5
+skinparam NoteBackgroundColor #FFF8DC
+skinparam NoteBorderColor #DAA520
+skinparam NoteBorderThickness 1.5
+skinparam ClassBorderThickness 1.5
+skinparam ClassBorderColor #333333
+skinparam ClassBackgroundColor #F0F8FF
+
+title OpenMP Data Sharing and Variable Scoping
+
+package "Thread Memory Spaces" {
+    package "Sequential Region" as seq {
+        class "Main Memory" as mainmem {
+            int shared_var = 0
+            int global_var = 100
+        }
+    }
+    
+    package "Parallel Region" as par {
+        package "Thread 0 (Master)" as t0 {
+            class "Thread-Local Memory" as t0mem {
+                int private_var = 10
+                int firstprivate_var = 5
+                int shared_var = 0 (reference)
+                int global_var = 100 (reference)
+                int lastprivate_var = 0
+                int threadprivate_var = 20
+            }
+        }
+        
+        package "Thread 1" as t1 {
+            class "Thread-Local Memory" as t1mem {
+                int private_var = 20
+                int firstprivate_var = 5
+                int shared_var = 0 (reference)
+                int global_var = 100 (reference)
+                int lastprivate_var = 0
+                int threadprivate_var = 30
+            }
+        }
+        
+        package "Thread 2" as t2 {
+            class "Thread-Local Memory" as t2mem {
+                int private_var = 30
+                int firstprivate_var = 5
+                int shared_var = 0 (reference)
+                int global_var = 100 (reference)
+                int lastprivate_var = 50
+                int threadprivate_var = 40
+            }
+        }
+    }
+}
+
+note bottom of t0
+  Each thread gets its own copy of 
+  **private**, **firstprivate**, and **lastprivate** variables.
+  **shared** variables are accessed by all threads.
+end note
+
+note right of mainmem
+  **shared** variables are stored in main memory 
+  and accessed by all threads.
+  Potential for race conditions!
+end note
+
+note bottom of t2mem
+  Value of **lastprivate_var** from 
+  the last iteration is copied back
+  to the original variable
+end note
+
+note top of t0mem
+  **firstprivate** variables are initialized with
+  the value from the sequential region
+end note
+
+note right of t1mem
+  **threadprivate** variables persist between
+  parallel regions for the same thread
+end note
+
+t0 -[hidden]-> t1
+t1 -[hidden]-> t2
+seq -[hidden]-> par
+
+@enduml 

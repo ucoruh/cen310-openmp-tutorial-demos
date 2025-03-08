@@ -1,0 +1,74 @@
+@startuml openmp_parallel_region
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 12
+skinparam BackgroundColor #FFFFFF
+skinparam TitleFontSize 18
+skinparam ArrowColor #2C3E50
+skinparam SequenceLifeLineBorderColor #2C3E50
+skinparam SequenceGroupBodyBackgroundColor #E8F4F9
+skinparam SequenceGroupBorderColor #2E86C1
+skinparam SequenceBoxBackgroundColor #F8F9FA
+skinparam SequenceBoxBorderColor #DEE2E6
+
+title OpenMP Parallel Region Execution Flow
+
+actor "Main Program" as main
+participant "Master Thread" as master
+participant "Thread 1" as t1
+participant "Thread 2" as t2
+participant "Thread 3" as t3
+
+note over main: Sequential execution
+
+main -> master: Start program execution
+
+group Sequential Region
+    master -> master: Sequential code execution
+end group
+
+group "#pragma omp parallel" as ParallelRegion
+    master -> t1: Fork thread
+    master -> t2: Fork thread
+    master -> t3: Fork thread
+    
+    note over master, t3: Parallel execution begins
+    
+    master -> master: Execute parallel region code
+    t1 -> t1: Execute parallel region code
+    t2 -> t2: Execute parallel region code
+    t3 -> t3: Execute parallel region code
+    
+    group "#pragma omp barrier" as Barrier
+        note over master, t3: All threads wait at barrier
+        master --> master: Wait for all threads
+        t1 --> t1: Wait for all threads
+        t2 --> t2: Wait for all threads
+        t3 --> t3: Wait for all threads
+    end
+    
+    group "#pragma omp single" as Single
+        note over master: Only one thread executes this block
+        master -> master: Execute single thread code
+        note over t1, t3: Other threads wait
+    end
+    
+    group "#pragma omp master" as Master
+        note over master: Only master thread executes this block
+        master -> master: Execute master thread code
+        note over t1, t3: Other threads continue (no implicit barrier)
+    end
+    
+    master --> t1: Join thread
+    master --> t2: Join thread
+    master --> t3: Join thread
+    
+    note over master, t3: Parallel execution ends
+end group
+
+group Sequential Region
+    master -> master: Continue sequential execution
+end group
+
+main <- master: End program execution
+
+@enduml 

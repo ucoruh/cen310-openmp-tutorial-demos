@@ -1,0 +1,104 @@
+@startuml openmp_synchronization
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 12
+skinparam BackgroundColor #FFFFFF
+skinparam TitleFontSize 18
+skinparam ArrowColor #000000
+skinparam ArrowThickness 1.5
+skinparam SequenceLifeLineBorderColor #000000
+skinparam SequenceLifeLineThickness 1.5
+skinparam SequenceGroupBodyBackgroundColor #E6F2FF
+skinparam SequenceGroupBorderColor #0066CC
+skinparam SequenceGroupBorderThickness 1.5
+skinparam SequenceBoxBackgroundColor #F8F9FA
+skinparam SequenceBoxBorderColor #666666
+skinparam SequenceBoxBorderThickness 1.5
+skinparam NoteBackgroundColor #FFF8DC
+skinparam NoteBorderColor #DAA520
+skinparam NoteBorderThickness 1.5
+skinparam ActorBorderThickness 1.5
+skinparam ParticipantBorderThickness 1.5
+skinparam ParticipantBorderColor #333333
+skinparam ParticipantBackgroundColor #F0F8FF
+
+title OpenMP Synchronization Mechanisms
+
+actor "Main Program" as main
+participant "Thread 0" as t0
+participant "Thread 1" as t1
+participant "Thread 2" as t2
+
+note over main: Sequential execution
+
+main -> t0: Start parallel region
+main -> t1: Create Thread
+main -> t2: Create Thread
+
+note over t0, t2: Each thread executes in parallel
+
+group "#pragma omp barrier" as Barrier
+    note over t0, t2: All threads wait here until everyone reaches this point
+    t0 --> t0: Wait until all threads arrive
+    t1 --> t1: Wait until all threads arrive
+    t2 --> t2: Wait until all threads arrive
+end
+
+t0 -> t0: Continue execution
+t1 -> t1: Continue execution
+t2 -> t2: Continue execution
+
+group "#pragma omp critical" as Critical
+    note over t0, t2: Only one thread at a time can execute this region
+    t1 -> t1: Enter critical section
+    note over t1: Executing critical section
+    t1 -> t1: Exit critical section
+    t0 -> t0: Enter critical section
+    note over t0: Executing critical section
+    t0 -> t0: Exit critical section
+    t2 -> t2: Enter critical section
+    note over t2: Executing critical section
+    t2 -> t2: Exit critical section
+end
+
+t0 -> t0: Continue execution
+t1 -> t1: Continue execution
+t2 -> t2: Continue execution
+
+group "#pragma omp atomic" as Atomic
+    note over t0, t2: Atomic operation on shared variables
+    t0 -> t0: Perform atomic operation
+    t1 -> t1: Perform atomic operation
+    t2 -> t2: Perform atomic operation
+end
+
+t0 -> t0: Continue execution
+t1 -> t1: Continue execution
+t2 -> t2: Continue execution
+
+group "#pragma omp ordered" as Ordered
+    note over t0, t2: Execute this block in the original sequential order
+    t0 -> t0: Execute ordered block (iteration 0)
+    t1 -> t1: Wait for its turn
+    t2 -> t2: Wait for its turn
+    t0 -> t1: Signal next thread
+    t1 -> t1: Execute ordered block (iteration 1)
+    t1 -> t2: Signal next thread
+    t2 -> t2: Execute ordered block (iteration 2)
+end
+
+group "#pragma omp flush" as Flush
+    note over t0, t2: Ensure all threads see the most recent value of variables
+    t0 -> t0: Update shared variable
+    t0 -> t0: Flush memory
+    t1 -> t1: Flush memory
+    t2 -> t2: Flush memory
+    note over t0, t2: All threads now see the updated value
+end
+
+main <- t0: Join threads
+main <- t1
+main <- t2
+
+note over main: Sequential execution resumes
+
+@enduml 

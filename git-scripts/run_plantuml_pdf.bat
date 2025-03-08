@@ -22,5 +22,4 @@ java -Xmx2048m -Dfile.encoding=UTF-8 -DPLANTUML_LIMIT_SIZE=32768 -jar "%~dp0plan
 echo Revert to the original directory
 cd "%currentDir%"
 
-pause
 @endlocal

@@ -1,0 +1,77 @@
+@startuml debugging_performance
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 12
+skinparam BackgroundColor #FFFFFF
+skinparam TitleFontSize 18
+skinparam ArrowColor #000000
+skinparam ArrowThickness 1.5
+skinparam ActivityBackgroundColor #E6F2FF
+skinparam ActivityBorderColor #0066CC
+skinparam ActivityBorderThickness 1.5
+skinparam PartitionBackgroundColor #F0F0F0
+skinparam PartitionBorderColor #666666
+skinparam PartitionBorderThickness 1.5
+skinparam NoteBackgroundColor #FFF8DC
+skinparam NoteBorderColor #DAA520
+skinparam NoteBorderThickness 1.5
+
+title OpenMP Debugging and Performance Optimization
+
+|Code Development|
+partition "Common Issues" {
+    :"Race Condition:\nMultiple threads modify the same variable\nwithout proper synchronization" as race #FFDDDD;
+    note right #FFEEEE: Fix with critical, atomic,\nor private variables
+    
+    :"Load Imbalance:\nSome threads finish quickly\nwhile others have too much work" as imbalance #FFDDDD;
+    note right #FFEEEE: Fix with dynamic/guided\nscheduling or tasks
+    
+    :"False Sharing:\nThreads access different variables\nthat share the same cache line" as falseSharing #FFDDDD;
+    note right #FFEEEE: Fix with padding or\nrestructuring data access
+    
+    :"Over-parallelization:\nToo much overhead from\ncreating and managing threads" as overhead #FFDDDD;
+    note right #FFEEEE: Only parallelize code with\nsufficient computation
+}
+
+|Performance Analysis|
+partition "Profiling Tools" {
+    :"Intel VTune\nAMD µProf\nHPCToolkit" as profiling #DDEEDD;
+    note right #EEFFEE: Identify hotspots and\nparallelization opportunities
+    
+    :"OMP_DISPLAY_ENV=true/verbose\nDisplay OpenMP environment variables" as env #DDEEDD;
+    note right #EEFFEE: Verify configuration
+}
+
+|Performance Tuning|
+partition "Optimization Strategies" {
+    :"Thread Count Optimization:\nOMP_NUM_THREADS=optimal" as threadCount #DDDDFF;
+    note right #EEEEFF: Find balance between\nparallelism and overhead
+    
+    :"Scheduling Strategy Optimization:\nschedule(static|dynamic|guided)" as scheduling #DDDDFF;
+    note right #EEEEFF: Match work distribution\nwith workload pattern
+    
+    :"Data Locality Optimization:\nRestructure data access patterns" as locality #DDDDFF;
+    note right #EEEEFF: Minimize cache misses
+    
+    :"Granularity Adjustment:\nMerge small tasks, split large ones" as granularity #DDDDFF;
+    note right #EEEEFF: Balance overhead vs parallelism
+    
+    :"Hybrid Parallelism:\nCombine OpenMP with MPI\nfor distributed systems" as hybrid #DDDDFF;
+    note right #EEEEFF: Scale beyond single node
+}
+
+|Debugging|
+partition "Debugging Tools" {
+    :"OMP_DISPLAY_ENV=true\nOMP_DISPLAY_AFFINITY=true" as displayEnv #DDDDEE;
+    note right #EEEEFF: View runtime configuration
+    
+    :"OMP_CANCELLATION=true\nomp_set_cancel()" as cancel #DDDDEE;
+    note right #EEEEFF: Allow cancellation of regions
+    
+    :"Intel Inspector\nHelgrind (Valgrind)" as threadTools #DDDDEE;
+    note right #EEEEFF: Detect race conditions,\ndeadlocks
+    
+    :"LLVM/GCC OpenMP debug flags\n-fopenmp-simd" as compilerFlags #DDDDEE;
+    note right #EEEEFF: Compiler-specific debug options
+}
+
+@enduml 

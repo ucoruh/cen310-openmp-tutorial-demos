@@ -1,6 +1,122 @@
-# OpenMP Parallel For Loops Demo
+# 🔁 OpenMP Parallel For Loops
 
-This project demonstrates the use of OpenMP parallel for loops for high-performance computing in C++. It shows how to effectively parallelize loops for initialization and reduction operations, with comprehensive performance comparisons.
+This project demonstrates how to use OpenMP to parallelize loops for better performance on multi-core systems.
+
+## 🎯 Overview
+
+Loop parallelization is one of the most common and effective ways to improve performance with OpenMP. This module covers different strategies for distributing loop iterations among threads and understanding the performance implications of each approach.
+
+## 📊 Parallel For Loop Iteration Distribution
+
+The following diagram illustrates how loop iterations are distributed among threads with different OpenMP scheduling strategies:
+
+![Parallel For Loop](./assets/parallel_for_loop.png)
+
+## 🧩 Key OpenMP Loop Constructs
+
+### 1. Basic Parallel For
+
+```cpp
+#pragma omp parallel for
+for (int i = 0; i < N; i++) {
+    // Each iteration is executed by one thread
+    process(i);
+}
+```
+
+The `parallel for` directive combines a parallel region with a loop work-sharing construct, dividing the iterations among threads.
+
+### 2. Schedule Clause Types
+
+OpenMP provides several scheduling strategies to control how loop iterations are assigned to threads:
+
+#### Static Scheduling
+
+```cpp
+#pragma omp parallel for schedule(static, chunk_size)
+```
+
+- Iterations are divided into chunks of size `chunk_size` (default: N/num_threads)
+- Chunks are assigned to threads in a round-robin fashion
+- **Advantage**: Low overhead, predictable assignment pattern
+- **Best for**: Uniform workload per iteration
+
+#### Dynamic Scheduling
+
+```cpp
+#pragma omp parallel for schedule(dynamic, chunk_size)
+```
+
+- Iterations are divided into chunks of size `chunk_size` (default: 1)
+- Chunks are assigned to threads on a first-come, first-served basis
+- **Advantage**: Better load balancing for uneven workloads
+- **Best for**: Variable workload per iteration
+- **Trade-off**: Higher scheduling overhead
+
+#### Guided Scheduling
+
+```cpp
+#pragma omp parallel for schedule(guided, min_chunk_size)
+```
+
+- Chunks start large and decrease exponentially to `min_chunk_size`
+- **Advantage**: Balances scheduling overhead and load balancing
+- **Best for**: Variable workload with unknown distribution
+
+#### Auto Scheduling
+
+```cpp
+#pragma omp parallel for schedule(auto)
+```
+
+- The compiler and runtime system determine the scheduling
+- **Best for**: When you're not sure which schedule to use
+
+#### Runtime Scheduling
+
+```cpp
+#pragma omp parallel for schedule(runtime)
+```
+
+- Scheduling is determined at runtime by the `OMP_SCHEDULE` environment variable
+- **Best for**: Testing different schedules without recompiling
+
+## 💻 Examples in This Project
+
+This project includes the following examples:
+
+1. **Basic Parallel For**: Simple demonstration of parallelizing a for loop
+2. **Scheduling Comparison**: Performance comparison of different scheduling strategies
+3. **Nested Loops**: Techniques for handling nested loops
+4. **Loop Dependencies**: How to handle loops with dependencies between iterations
+
+## 🚀 Running the Examples
+
+Use the provided scripts to configure, build, and run the examples:
+
+1. Run `configure.bat` to set up the CMake project
+2. Run `build_all.bat` to compile all examples
+3. Run `run.bat` to execute the examples
+
+Example usage:
+
+```bash
+run.bat --debug --example scheduling_comparison
+```
+
+## 📈 Performance Considerations
+
+1. **Iteration Count**: Ensure enough iterations to justify parallelization overhead
+2. **Workload Balance**: Choose appropriate scheduling based on workload distribution
+3. **Thread Count**: Too many threads can lead to excessive overhead
+4. **Loop Body Size**: Small loop bodies may not benefit from parallelization
+5. **Data Access Patterns**: Consider data locality and access patterns
+
+## 📚 Additional Resources
+
+- [OpenMP Loop Constructs](https://www.openmp.org/spec-html/5.0/openmpsu36.html)
+- [Loop Scheduling Tutorial](https://hpc-tutorials.llnl.gov/openmp/for_scheduling/)
+- [Performance Optimization Guide](https://www.openmp.org/wp-content/uploads/openmp-examples-4.5.0.pdf)
 
 ## Learning Objectives
 

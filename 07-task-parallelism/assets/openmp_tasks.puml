@@ -1,0 +1,101 @@
+@startuml openmp_tasks
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 12
+skinparam BackgroundColor #FFFFFF
+skinparam TitleFontSize 18
+skinparam ArrowColor #000000
+skinparam ArrowThickness 1.5
+skinparam ActivityBackgroundColor #E6F2FF
+skinparam ActivityBorderColor #0066CC
+skinparam ActivityBorderThickness 1.5
+skinparam NoteBackgroundColor #FFF8DC
+skinparam NoteBorderColor #DAA520
+skinparam NoteBorderThickness 1.5
+skinparam ActivityDiamondBackgroundColor #FFE6CC
+skinparam ActivityDiamondBorderColor #FF9933
+skinparam PartitionBorderThickness 1.5
+skinparam PartitionBorderColor #333333
+
+title OpenMP Task Parallelism
+
+|Main Thread|
+start
+:Create thread team;
+
+|Thread Pool|
+split
+    |Thread 0|
+    :Create Task A;
+    :Create Task B;
+    :Create Task C;
+    note right: Tasks are created but not executed yet
+    
+    :Execute available task\n(Task B);
+    note right: Thread picks a task from the pool
+split again
+    |Thread 1|
+    :Wait for tasks;
+    :Execute available task\n(Task C);
+split again
+    |Thread 2|
+    :Wait for tasks;
+    :Execute available task\n(Task A);
+end split
+
+|Thread 0|
+:Create Task D\n(with dependency on Task B);
+note right: Task D will not execute until Task B completes
+
+|Thread Pool|
+split
+    |Thread 0|
+    #AAFFAA:Task B completed;
+    :Execute Task D;
+split again
+    |Thread 1|
+    #AAFFAA:Task C completed;
+    :Wait for tasks;
+split again
+    |Thread 2|
+    #AAFFAA:Task A completed;
+    :Wait for tasks;
+end split
+
+|Thread 0|
+:#pragma omp taskwait;
+note right: Wait for all tasks to complete
+
+|Thread Pool|
+:All tasks complete;
+
+|Main Thread|
+:Continue execution;
+stop
+
+note right
+  <b>Task Creation:</b>
+  #pragma omp task
+  {
+    // Task code here
+  }
+  
+  <b>Task Synchronization:</b>
+  #pragma omp taskwait
+  
+  <b>Task Dependencies:</b>
+  #pragma omp task depend(in:x) depend(out:y)
+  {
+    // Task with dependencies
+  }
+end note
+
+note left
+  <b>Task Characteristics:</b>
+  - Created by one thread, executed by any thread
+  - Can be created dynamically at runtime
+  - Ideal for irregular parallelism
+  - Can have dependencies between tasks
+  - More flexible than loop parallelism
+end note
+
+@enduml 

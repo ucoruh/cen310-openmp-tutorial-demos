@@ -22,5 +22,4 @@ java -jar "%~dp0plantuml.jar" -v -testdot
 echo Revert to the original directory
 cd "%currentDir%"
 
-pause
 @endlocal

@@ -1,3 +1,85 @@
+# 🔄 OpenMP Basic Parallel Operations
+
+This project demonstrates the fundamental concepts of OpenMP parallel programming with simple examples.
+
+## 🎯 Overview
+
+OpenMP (Open Multi-Processing) is an API that supports multi-platform shared memory multiprocessing programming in C, C++, and Fortran. It consists of compiler directives, library routines, and environment variables that influence runtime behavior.
+
+## 📋 Basic OpenMP Concepts
+
+The following diagram illustrates the core components and concepts of OpenMP:
+
+![OpenMP Basic Concepts](./assets/openmp_basic_concepts.png)
+
+## 🧩 Key Components
+
+### 1. Directives
+
+OpenMP directives are compiler instructions that define parallel regions and operations:
+
+- `#pragma omp parallel`: Creates a team of threads
+- `#pragma omp for`: Distributes loop iterations among threads
+- `#pragma omp sections`: Divides code into discrete sections executed by different threads
+- `#pragma omp critical`: Ensures exclusive access to a code block
+- `#pragma omp barrier`: Synchronizes all threads at a specific point
+
+### 2. Clauses
+
+Clauses provide additional information to directives:
+
+- `private(var)`: Each thread has its own copy of the variable
+- `shared(var)`: All threads access the same variable
+- `reduction(op:var)`: Combines thread-specific variables using an operation
+- `default(shared|none)`: Sets the default variable sharing attribute
+- `nowait`: Removes the implicit barrier at a directive's end
+
+### 3. Runtime Library Functions
+
+OpenMP provides functions to control and query the parallel execution:
+
+- `omp_get_num_threads()`: Returns the number of threads in the current team
+- `omp_get_thread_num()`: Returns the ID of the calling thread
+- `omp_set_num_threads()`: Sets the number of threads for subsequent parallel regions
+- `omp_in_parallel()`: Returns true if called from within a parallel region
+
+### 4. Environment Variables
+
+Environment variables control OpenMP behavior:
+
+- `OMP_NUM_THREADS`: Sets the default number of threads
+- `OMP_SCHEDULE`: Sets the default schedule type and chunk size
+- `OMP_STACKSIZE`: Sets the stack size for each thread
+
+## 💻 Examples in This Project
+
+This project includes the following examples:
+
+1. **Basic Parallel Region**: Demonstrates creating a team of threads and distributing work
+2. **Thread Information**: Shows how to identify threads and query information
+3. **Work Sharing**: Illustrates different methods of distributing work among threads
+4. **Data Scoping**: Showcases variable sharing and privatization techniques
+
+## 🚀 Running the Examples
+
+Use the provided scripts to configure, build, and run the examples:
+
+1. Run `configure.bat` to set up the CMake project
+2. Run `build_all.bat` to compile all examples
+3. Run `run.bat` to execute the examples
+
+Example usage:
+
+```bash
+run.bat --debug --example basic_parallel
+```
+
+## 📚 Additional Resources
+
+- [OpenMP API Specification](https://www.openmp.org/specifications/)
+- [OpenMP Tutorial on LLNL HPC](https://hpc-tutorials.llnl.gov/openmp/)
+- [Best Practices for OpenMP](https://www.openmp.org/wp-content/uploads/openmp-examples-4.5.0.pdf)
+
 # OpenMP Basic Parallel Demo
 
 This project demonstrates the fundamental concepts of parallel programming using OpenMP in C++. It is designed to work with Visual Studio 2022 on Windows and is configured using CMake.

@@ -1,212 +1,118 @@
-# OpenMP Reduction Operations Demo
+# ➕ OpenMP Reduction Operations
 
-This project demonstrates various OpenMP reduction operations and different implementation techniques for parallel reductions. It compares the performance of various approaches and validates their correctness.
+This project demonstrates the use of reduction operations in OpenMP to safely combine thread-local results in parallel computations.
 
-## Project Overview
+## 🎯 Overview
 
-Reduction operations in parallel computing combine multiple values into a single result using an associative operator (like `+`, `*`, `min`, `max`, etc.). In OpenMP, reductions are a common parallel pattern that can greatly benefit from proper implementation.
+Reduction operations are a powerful feature of OpenMP that allow multiple threads to safely combine their local results into a single global result. This is essential for operations like summing values, finding maximums/minimums, or applying other operations where multiple threads contribute to a final result.
 
-This demo includes:
+## 📊 OpenMP Reduction Operations
 
-1. **Multiple reduction operators**: sum, product, min/max, logical operations (AND/OR), and bitwise operations
-2. **Different implementation approaches**:
-   - Sequential (baseline)
-   - Parallel with critical sections (inefficient)
-   - Parallel with atomic operations
-   - Manual reduction with thread-local variables
-   - OpenMP reduction clause (most efficient)
-3. **Performance comparisons** across different data sizes
-4. **Result validation** to ensure correctness
+The following diagram illustrates how reduction operations work in OpenMP:
 
-## Prerequisites
+![OpenMP Reduction](./assets/openmp_reduction.png)
 
-- C++17 compatible compiler (MSVC, GCC, or Clang)
-- CMake 3.10 or higher
-- OpenMP support in your compiler
+## 🧩 Supported Reduction Operators
 
-## Building and Running
+OpenMP supports the following reduction operators:
 
-### Step 1: Configure
+| Operator | Description             | Example                                      |
+|----------|-------------------------|----------------------------------------------|
+| `+`      | Sum                     | `#pragma omp parallel for reduction(+:sum)`  |
+| `-`      | Difference              | `#pragma omp parallel for reduction(-:diff)` |
+| `*`      | Product                 | `#pragma omp parallel for reduction(*:prod)` |
+| `&`      | Bitwise AND             | `#pragma omp parallel for reduction(&:mask)` |
+| `\|`     | Bitwise OR              | `#pragma omp parallel for reduction(\|:flags)` |
+| `^`      | Bitwise XOR             | `#pragma omp parallel for reduction(^:bits)` |
+| `&&`     | Logical AND             | `#pragma omp parallel for reduction(&&:all)` |
+| `\|\|`   | Logical OR              | `#pragma omp parallel for reduction(\|\|:any)` |
+| `min`    | Minimum                 | `#pragma omp parallel for reduction(min:min_val)` |
+| `max`    | Maximum                 | `#pragma omp parallel for reduction(max:max_val)` |
 
-Run the configuration script:
-```
-configure.bat
-```
+## 💻 Basic Reduction Examples
 
-### Step 2: Build
-
-Build the project in Debug and Release configurations:
-```
-build_all.bat
-```
-
-### Step 3: Run
-
-Use the unified `run.bat` script with various options:
-
-```
-run.bat                          # Run with default settings (Release mode)
-run.bat --debug                  # Run in Debug mode with additional diagnostics
-run.bat --release                # Run in Release mode (optimized performance)
-run.bat --threads 8              # Run with 8 threads
-run.bat --reduction sum          # Run only the sum reduction example
-run.bat --verbose                # Run with verbose output
-run.bat --help                   # Show all available options
-```
-
-For the most comprehensive experience, you can use:
-
-```
-run_all.bat                      # Run all demonstrations in sequence
-```
-
-This will execute all reduction examples with various thread counts and performance comparisons.
-
-For specific reduction types, we also provide:
-
-```
-run.bat --reduction sum          # Demonstrate sum reduction
-run.bat --reduction product      # Demonstrate product reduction
-run.bat --reduction min          # Demonstrate min reduction
-run.bat --reduction max          # Demonstrate max reduction
-run.bat --reduction custom       # Demonstrate custom reduction
-```
-
-**Note**: For accurate performance measurements, always use the Release build.
-
-### Step 4: Clean
-
-If you want to clean the build files and start from scratch:
-
-```
-clean.bat
-```
-
-This will remove all build artifacts and temporary files.
-
-## Implementation Approaches
-
-The project demonstrates several approaches to implementing reductions:
-
-### 1. Sequential (Baseline)
-
-A simple sequential implementation for reference:
+### Sum Reduction
 
 ```cpp
-double sum = 0.0;
-for (const auto& val : data) {
-    sum += val;
-}
-```
-
-### 2. Parallel with Critical Section
-
-The simplest (but inefficient) parallel approach:
-
-```cpp
-double sum = 0.0;
-#pragma omp parallel for
-for (size_t i = 0; i < data.size(); ++i) {
-    #pragma omp critical
-    {
-        sum += data[i];
-    }
-}
-```
-
-### 3. Parallel with Atomic Operations
-
-Better than critical sections for simple operations:
-
-```cpp
-double sum = 0.0;
-#pragma omp parallel for
-for (size_t i = 0; i < data.size(); ++i) {
-    #pragma omp atomic
-    sum += data[i];
-}
-```
-
-### 4. Manual Reduction
-
-Each thread maintains a local copy, combining at the end:
-
-```cpp
-double sum = 0.0;
-#pragma omp parallel
-{
-    double local_sum = 0.0;
-    
-    #pragma omp for
-    for (size_t i = 0; i < data.size(); ++i) {
-        local_sum += data[i];
-    }
-    
-    #pragma omp critical
-    {
-        sum += local_sum;
-    }
-}
-```
-
-### 5. OpenMP Reduction Clause
-
-The most elegant and efficient approach:
-
-```cpp
-double sum = 0.0;
+int sum = 0;
 #pragma omp parallel for reduction(+:sum)
-for (size_t i = 0; i < data.size(); ++i) {
-    sum += data[i];
+for (int i = 0; i < 1000; i++) {
+    sum += array[i];
+}
+// sum now contains the sum of all array elements
+```
+
+### Min/Max Reduction
+
+```cpp
+int min_val = INT_MAX;
+int max_val = INT_MIN;
+#pragma omp parallel for reduction(min:min_val) reduction(max:max_val)
+for (int i = 0; i < 1000; i++) {
+    min_val = (array[i] < min_val) ? array[i] : min_val;
+    max_val = (array[i] > max_val) ? array[i] : max_val;
 }
 ```
 
-## Supported Reduction Operations
+### Logical Reduction
 
-This demo includes examples of all standard OpenMP reduction operations:
+```cpp
+bool all_positive = true;
+#pragma omp parallel for reduction(&&:all_positive)
+for (int i = 0; i < 1000; i++) {
+    all_positive = all_positive && (array[i] > 0);
+}
+```
 
-| Operator | Description | Example |
-|----------|-------------|---------|
-| `+` | Addition | `reduction(+:sum)` |
-| `*` | Multiplication | `reduction(*:product)` |
-| `-` | Subtraction | `reduction(-:diff)` |
-| `&` | Bitwise AND | `reduction(&:bit_and)` |
-| `\|` | Bitwise OR | `reduction(\|:bit_or)` |
-| `^` | Bitwise XOR | `reduction(^:bit_xor)` |
-| `&&` | Logical AND | `reduction(&&:logical_and)` |
-| `\|\|` | Logical OR | `reduction(\|\|:logical_or)` |
-| `min` | Minimum | `reduction(min:min_val)` |
-| `max` | Maximum | `reduction(max:max_val)` |
+## 🔍 Custom Reductions
 
-## Performance Analysis
+OpenMP also supports custom reduction operations with user-defined types using the `declare reduction` directive:
 
-The program tests each approach with different data sizes:
-- Small (10,000 elements)
-- Medium (1,000,000 elements) 
-- Large (10,000,000 elements)
+```cpp
+struct Vector { double x, y, z; };
 
-Expected performance patterns:
-1. Sequential: Baseline performance
-2. Critical section: Often slower than sequential due to contention
-3. Atomic operations: Better than critical but still has overhead
-4. Manual reduction: Good performance with minimal synchronization
-5. OpenMP reduction: Best performance, often comparable to manual reduction
+// Declare a vector addition reduction
+#pragma omp declare reduction(vec_add : Vector : omp_out = {omp_out.x + omp_in.x, \
+                                                           omp_out.y + omp_in.y, \
+                                                           omp_out.z + omp_in.z}) \
+                    initializer(omp_priv = {0.0, 0.0, 0.0})
 
-## Validation
+Vector sum = {0.0, 0.0, 0.0};
+#pragma omp parallel for reduction(vec_add:sum)
+for (int i = 0; i < 1000; i++) {
+    // Perform vector addition
+    sum.x += vectors[i].x;
+    sum.y += vectors[i].y;
+    sum.z += vectors[i].z;
+}
+```
 
-The program validates that all parallel implementations produce the same results as the sequential version, within a small tolerance for floating-point operations.
+## 📈 Performance Considerations
 
-## Advanced Features
+1. **Initialization Cost**: Each thread must initialize its private copy of the reduction variable
+2. **Combining Cost**: Thread results must be combined at the end of the parallel region
+3. **Vectorization**: Reduction loops can often be vectorized for additional performance
+4. **Custom Reductions**: Custom reductions may have higher overhead than built-in operations
 
-The project also demonstrates:
-- Multiple reduction operations in a single loop
-- Custom reduction operations (sum of squares)
-- Dynamic thread management
+## 🚀 Running the Examples
 
-## Additional Resources
+Use the provided scripts to configure, build, and run the examples:
 
-For more detailed information about OpenMP reductions, see the companion guide:
-[OpenMP Reduction Guide](REDUCTION_GUIDE.md)
+1. Run `configure.bat` to set up the CMake project
+2. Run `build_all.bat` to compile all examples
+3. Run `run.bat` to execute the examples
+
+Example usage:
+
+```bash
+run.bat --debug --example sum_reduction
+```
+
+## 📚 Additional Resources
+
+- [OpenMP Reduction Clause Specification](https://www.openmp.org/spec-html/5.0/openmpsu43.html)
+- [Custom Reductions in OpenMP](https://www.openmp.org/spec-html/5.0/openmpsu107.html)
+- [Reduction Patterns Guide](https://hpc-tutorials.llnl.gov/openmp/reduction/)
 
 ## License
 

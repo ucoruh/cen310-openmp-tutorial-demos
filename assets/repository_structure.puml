@@ -1,0 +1,56 @@
+@startuml repository_structure
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 12
+skinparam ArrowColor #2C3E50
+skinparam BackgroundColor #FFFFFF
+skinparam PackageBackgroundColor #F8F9FA
+skinparam PackageBorderColor #DEE2E6
+skinparam TitleFontSize 20
+
+title OpenMP Tutorial Demos - Repository Structure
+
+package "OpenMP Tutorial Demos" as main {
+    package "00-basic-command-line" as p0 #E9F7EF
+    package "01-basic-parallel" as p1 #E9F7EF
+    package "02-parallel-for-loops" as p2 #E9F7EF
+    package "03-scheduling-strategies" as p3 #D4EFDF
+    package "04-data-sharing" as p4 #D4EFDF
+    package "05-reduction-operations" as p5 #D4EFDF
+    package "06-synchronization" as p6 #A9DFBF
+    package "07-task-parallelism" as p7 #A9DFBF
+    package "08-nested-affinity" as p8 #7DCEA0
+    package "09-simd-vectorization" as p9 #7DCEA0
+    package "10-debugging-performance" as p10 #52BE80
+    
+    package "common" as common #F5CBA7
+    package "reports" as reports #F5CBA7
+    package "git-scripts" as scripts #F5CBA7
+}
+
+note bottom of p0
+  **Basic Level**
+  Introduction to OpenMP
+end note
+
+note bottom of p5
+  **Intermediate Level**
+  Data operations and management
+end note
+
+note bottom of p10
+  **Advanced Level**
+  Performance optimization
+end note
+
+p0 -[hidden]-> p1
+p1 -[hidden]-> p2
+p2 -[hidden]-> p3
+p3 -[hidden]-> p4
+p4 -[hidden]-> p5
+p5 -[hidden]-> p6
+p6 -[hidden]-> p7
+p7 -[hidden]-> p8
+p8 -[hidden]-> p9
+p9 -[hidden]-> p10
+
+@enduml 

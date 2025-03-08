@@ -27,5 +27,4 @@ echo ::: UPDATE SUBMODULES COMPLETED ::::
 echo Revert to the original directory
 cd "%currentDir%"
 
-pause
 @endlocal

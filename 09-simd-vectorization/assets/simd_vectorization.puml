@@ -1,0 +1,87 @@
+@startuml simd_vectorization
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 12
+skinparam BackgroundColor #FFFFFF
+skinparam TitleFontSize 18
+skinparam ArrowColor #000000
+skinparam ArrowThickness 1.5
+skinparam RectangleBackgroundColor #E6F2FF
+skinparam RectangleBorderColor #0066CC
+skinparam RectangleBorderThickness 1.5
+skinparam NoteBackgroundColor #FFF8DC
+skinparam NoteBorderColor #DAA520
+skinparam NoteBorderThickness 1.5
+
+title OpenMP SIMD Vectorization
+
+rectangle "Scalar Processing (Without SIMD)" as scalar {
+    rectangle "Load a[0]" as load1 #E6F2FF
+    rectangle "Load a[1]" as load2 #E6F2FF
+    rectangle "Load a[2]" as load3 #E6F2FF
+    rectangle "Load a[3]" as load4 #E6F2FF
+    
+    rectangle "Add b[0]" as add1 #D4E6F9
+    rectangle "Add b[1]" as add2 #D4E6F9
+    rectangle "Add b[2]" as add3 #D4E6F9
+    rectangle "Add b[3]" as add4 #D4E6F9
+    
+    rectangle "Store c[0]" as store1 #C2D9F2
+    rectangle "Store c[1]" as store2 #C2D9F2
+    rectangle "Store c[2]" as store3 #C2D9F2
+    rectangle "Store c[3]" as store4 #C2D9F2
+    
+    load1 -down-> add1
+    load2 -down-> add2
+    load3 -down-> add3
+    load4 -down-> add4
+    
+    add1 -down-> store1
+    add2 -down-> store2
+    add3 -down-> store3
+    add4 -down-> store4
+}
+
+rectangle "SIMD Vectorization" as simd {
+    rectangle "Load a[0:3]" as vload #CCE5FF
+    rectangle "Add b[0:3]" as vadd #99CCFF
+    rectangle "Store c[0:3]" as vstore #66B2FF
+    
+    vload -down-> vadd
+    vadd -down-> vstore
+}
+
+note right of scalar
+  <b>Scalar Operation:</b>
+  for(int i=0; i<4; i++) {
+    c[i] = a[i] + b[i];
+  }
+  
+  <b>4 iterations executed sequentially</b>
+  <b>1 operation per instruction</b>
+end note
+
+note right of simd
+  <b>SIMD Operation:</b>
+  #pragma omp simd
+  for(int i=0; i<4; i++) {
+    c[i] = a[i] + b[i];
+  }
+  
+  <b>Single SIMD instruction processes 4 elements</b>
+  <b>4 operations per instruction</b>
+end note
+
+note bottom
+  <b>Key OpenMP SIMD Directives:</b>
+  - #pragma omp simd - Vectorize a loop
+  - #pragma omp declare simd - Vectorize a function
+  - #pragma omp for simd - Parallelize and vectorize a loop
+  
+  <b>SIMD Clauses:</b>
+  - safelen(n) - Maximum safe vector length
+  - aligned(var:n) - Variable is aligned to n-byte boundary
+  - private(var) - Private copy of var for each SIMD lane
+  - reduction(op:var) - Combine results with operation
+end note
+
+@enduml 

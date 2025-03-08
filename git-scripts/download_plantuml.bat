@@ -65,5 +65,3 @@ if not exist "xml-apis-ext-1.3.04.jar" echo Missing xml-apis-ext-1.3.04.jar
 if not exist "xmlgraphics-commons-1.4.jar" echo Missing xmlgraphics-commons-1.4.jar
 
 echo All downloads and extractions completed successfully!
-
-pause

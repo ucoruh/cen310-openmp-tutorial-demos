@@ -1,0 +1,78 @@
+@startuml parallel_for_loop
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 12
+skinparam BackgroundColor #FFFFFF
+skinparam TitleFontSize 18
+skinparam ArrowColor #2C3E50
+skinparam SequenceLifeLineBorderColor #2C3E50
+skinparam SequenceGroupBodyBackgroundColor #E8F4F9
+skinparam SequenceGroupBorderColor #2E86C1
+skinparam SequenceBoxBackgroundColor #F8F9FA
+skinparam SequenceBoxBorderColor #DEE2E6
+
+title OpenMP Parallel For Loop Iteration Distribution
+
+participant "Main Thread" as main
+participant "Thread 0\n(Master)" as t0
+participant "Thread 1" as t1
+participant "Thread 2" as t2
+participant "Thread 3" as t3
+
+note over main: Sequential execution
+
+main -> main: int array[16];\nfor(int i=0; i<16; i++) {...}
+
+note right: Sequential Loop\n16 iterations by 1 thread
+
+main -> t0: #pragma omp parallel
+main -> t1: Create Thread
+main -> t2: Create Thread
+main -> t3: Create Thread
+
+group "#pragma omp parallel for" as ParallelFor
+    note over t0, t3: Distributes loop iterations among threads
+    
+    t0 -> t0: for(int i=0; i<4; i++) {...}
+    t1 -> t1: for(int i=4; i<8; i++) {...}
+    t2 -> t2: for(int i=8; i<12; i++) {...}
+    t3 -> t3: for(int i=12; i<16; i++) {...}
+    
+    note right t0: Thread 0 iterations: 0,1,2,3
+    note right t1: Thread 1 iterations: 4,5,6,7
+    note right t2: Thread 2 iterations: 8,9,10,11
+    note right t3: Thread 3 iterations: 12,13,14,15
+end group
+
+group "#pragma omp for schedule(static, 2)" as ScheduleStatic
+    note over t0, t3: Static scheduling with chunk size 2
+    
+    t0 -> t0: for(int i=0; i<2; i++) {...}\nfor(int i=8; i<10; i++) {...}
+    t1 -> t1: for(int i=2; i<4; i++) {...}\nfor(int i=10; i<12; i++) {...}
+    t2 -> t2: for(int i=4; i<6; i++) {...}\nfor(int i=12; i<14; i++) {...}
+    t3 -> t3: for(int i=6; i<8; i++) {...}\nfor(int i=14; i<16; i++) {...}
+    
+    note right t0: Thread 0 chunks: [0,1], [8,9]
+    note right t1: Thread 1 chunks: [2,3], [10,11]
+    note right t2: Thread 2 chunks: [4,5], [12,13]
+    note right t3: Thread 3 chunks: [6,7], [14,15]
+end group
+
+group "#pragma omp for schedule(dynamic, 2)" as ScheduleDynamic
+    note over t0, t3: Dynamic scheduling with chunk size 2\nChunks assigned on first-come, first-served basis
+    
+    t0 -> t0: for(int i=0; i<2; i++) {...}\nfor(int i=6; i<8; i++) {...}\nfor(int i=10; i<12; i++) {...}
+    t1 -> t1: for(int i=2; i<4; i++) {...}\nfor(int i=8; i<10; i++) {...}
+    t2 -> t2: for(int i=4; i<6; i++) {...}\nfor(int i=12; i<14; i++) {...}
+    t3 -> t3: for(int i=14; i<16; i++) {...}
+    
+    note left: Chunks assigned at runtime\nbased on thread availability
+end group
+
+main <- t0: Join threads
+main <- t1
+main <- t2
+main <- t3
+
+main -> main: Sequential execution continues
+
+@enduml 

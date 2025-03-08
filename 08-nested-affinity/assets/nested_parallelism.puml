@@ -1,0 +1,87 @@
+@startuml nested_parallelism
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 12
+skinparam BackgroundColor #FFFFFF
+skinparam TitleFontSize 18
+skinparam ArrowColor #000000
+skinparam ArrowThickness 1.5
+skinparam ParticipantBackgroundColor #E6F2FF
+skinparam ParticipantBorderColor #0066CC
+skinparam ParticipantBorderThickness 1.5
+skinparam NoteBackgroundColor #FFF8DC
+skinparam NoteBorderColor #DAA520
+skinparam NoteBorderThickness 1.5
+skinparam BoxBackgroundColor #E6FFFA
+skinparam BoxBorderColor #00A0A0
+skinparam BoxBorderThickness 1.5
+
+title OpenMP Nested Parallelism and Thread Affinity
+
+box "CPU 0" #D4F1F9
+    participant "Core 0\nThread 0.0" as T00
+    participant "Core 1\nThread 0.1" as T01
+end box
+
+box "CPU 1" #D4F9D4
+    participant "Core 2\nThread 1.0" as T10
+    participant "Core 3\nThread 1.1" as T11
+end box
+
+note over T00, T11: Sequential Execution
+
+T00 -> T00: Master thread executes sequentially
+
+note over T00, T11: Outer Parallel Region (4 threads)
+
+T00 -> T00: Thread 0 creates inner parallel region
+T00 -> T01: Inner thread 0.1
+T01 -> T01: Inner region work
+T00 -> T00: Inner region work (0.0)
+
+T10 -> T10: Thread 1 creates inner parallel region
+T10 -> T11: Inner thread 1.1
+T11 -> T11: Inner region work
+T10 -> T10: Inner region work (1.0)
+
+note over T00, T01: Inner barrier for Thread 0's team
+T00 --> T00: Wait at inner barrier
+T01 --> T01: Wait at inner barrier
+
+note over T10, T11: Inner barrier for Thread 1's team
+T10 --> T10: Wait at inner barrier
+T11 --> T11: Wait at inner barrier
+
+T00 -> T00: Thread 0 continues
+T01 -> T01: Thread 0.1 continues
+T10 -> T10: Thread 1 continues
+T11 -> T11: Thread 1.1 continues
+
+note over T00, T11: Outer barrier
+T00 --> T00: Wait at outer barrier
+T01 --> T01: Wait at outer barrier
+T10 --> T10: Wait at outer barrier
+T11 --> T11: Wait at outer barrier
+
+note over T00, T11: Sequential Execution Resumes
+T00 -> T00: Master thread continues
+
+note right
+  <b>Nested Parallelism Settings:</b>
+  - OMP_NESTED=true
+  - omp_set_nested(1)
+  - OMP_MAX_ACTIVE_LEVELS=2
+  - OMP_NUM_THREADS=2,2
+end note
+
+note left
+  <b>Thread Affinity Settings:</b>
+  - OMP_PROC_BIND=spread,close
+  - OMP_PLACES=cores
+  
+  <b>Affinity Controls:</b>
+  #pragma omp parallel proc_bind(spread)
+  #pragma omp parallel proc_bind(close)
+  #pragma omp parallel proc_bind(master)
+end note
+
+@enduml 

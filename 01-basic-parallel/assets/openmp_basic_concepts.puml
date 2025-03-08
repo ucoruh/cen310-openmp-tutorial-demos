@@ -1,0 +1,81 @@
+@startuml openmp_basic_concepts
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 12
+skinparam BackgroundColor #FFFFFF
+skinparam TitleFontSize 18
+skinparam ArrowColor #2C3E50
+skinparam NodeBackgroundColor #E8F4F9
+skinparam NodeBorderColor #2E86C1
+skinparam NodeFontColor #2C3E50
+skinparam NoteBackgroundColor #FEF9E7
+skinparam NoteBorderColor #F7DC6F
+
+title OpenMP Basic Parallel Concepts
+
+node "OpenMP Program" as program {
+    node "#include <omp.h>" as include
+
+    node "Directives" as directives {
+        node "#pragma omp parallel" as parallel
+        node "#pragma omp for" as for
+        node "#pragma omp sections" as sections
+        node "#pragma omp single" as single
+        node "#pragma omp master" as master
+    }
+
+    node "Runtime Library Functions" as functions {
+        node "omp_get_num_threads()" as get_num_threads
+        node "omp_get_thread_num()" as get_thread_num
+        node "omp_set_num_threads()" as set_num_threads
+    }
+
+    node "Environment Variables" as env {
+        node "OMP_NUM_THREADS" as num_threads
+        node "OMP_SCHEDULE" as schedule
+    }
+
+    node "Clauses" as clauses {
+        node "private(var)" as private
+        node "shared(var)" as shared
+        node "reduction(op:var)" as reduction
+        node "default(shared|none)" as default
+        node "nowait" as nowait
+    }
+}
+
+include --> directives
+include --> functions
+include --> env
+directives --> clauses
+
+note right of parallel
+  Creates a team of threads
+  that execute the block in parallel
+end note
+
+note right of for
+  Distributes loop iterations
+  among threads
+end note
+
+note right of private
+  Each thread has its
+  own copy of the variable
+end note
+
+note right of shared
+  All threads access
+  the same variable
+end note
+
+note bottom of num_threads
+  Sets the number of threads
+  for parallel regions
+end note
+
+note bottom of get_thread_num
+  Returns the ID of the
+  current thread (0 to N-1)
+end note
+
+@enduml 

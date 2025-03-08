@@ -1,0 +1,79 @@
+@startuml openmp_reduction
+skinparam DefaultFontName Arial
+skinparam DefaultFontSize 12
+skinparam BackgroundColor #FFFFFF
+skinparam TitleFontSize 18
+skinparam ArrowColor #000000
+skinparam ArrowThickness 1.5
+skinparam ActivityBackgroundColor #E6F2FF
+skinparam ActivityBorderColor #0066CC
+skinparam ActivityBorderThickness 1.5
+skinparam NoteBackgroundColor #FFF8DC
+skinparam NoteBorderColor #DAA520
+skinparam NoteBorderThickness 1.5
+skinparam ActivityDiamondBackgroundColor #FFE6CC
+skinparam ActivityDiamondBorderColor #FF9933
+skinparam PartitionBorderThickness 1.5
+skinparam PartitionBorderColor #333333
+
+title OpenMP Reduction Operations
+
+|Sequential Region|
+start
+:Initialize sum = 0;
+:Initialize array[10] = {1,2,3,4,5,6,7,8,9,10};
+
+|Parallel Region|
+fork
+    |Thread 0|
+    :Private copy: sum = 0;
+    :Process array[0-2];
+    :sum += (1+2+3) = 6;
+fork again
+    |Thread 1|
+    :Private copy: sum = 0;
+    :Process array[3-5];
+    :sum += (4+5+6) = 15;
+fork again
+    |Thread 2|
+    :Private copy: sum = 0;
+    :Process array[6-8];
+    :sum += (7+8+9) = 24;
+fork again
+    |Thread 3|
+    :Private copy: sum = 0;
+    :Process array[9];
+    :sum += 10 = 10;
+end fork
+
+:Combining Local Results:
+sum = 0 + 6 + 15 + 24 + 10 = 55;
+
+:shared sum = 55;
+
+|Sequential Region|
+:Continue with sum = 55;
+stop
+
+note right
+  <b>Reduction Operators</b>
+  - + (sum)
+  - * (product)
+  - - (difference)
+  - & (bitwise AND)
+  - | (bitwise OR)
+  - ^ (bitwise XOR)
+  - && (logical AND)
+  - || (logical OR)
+  - min (minimum)
+  - max (maximum)
+end note
+
+note left
+  <b>#pragma omp parallel for reduction(+:sum)</b>
+  for(int i=0; i<10; i++) {
+      sum += array[i];
+  }
+end note
+
+@enduml 

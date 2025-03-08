@@ -1,25 +1,142 @@
-# OpenMP Data Sharing Demo
+# 💾 OpenMP Data Sharing
 
-This project demonstrates OpenMP data sharing clauses and variable scoping concepts with practical examples. It visualizes the effects of different sharing mechanisms on parallel performance and correctness.
+This project demonstrates OpenMP data sharing mechanisms and variable scoping clauses essential for correct parallel programming.
 
-## Overview
+## 🎯 Overview
 
-OpenMP offers several data sharing clauses that control how variables are shared or privatized across threads:
+When working with shared memory parallel programming, understanding how variables are shared or privatized among threads is crucial for preventing race conditions and ensuring correct results. This module explores the various data sharing clauses available in OpenMP.
 
-| Clause | Description | Use Case |
-|--------|-------------|----------|
-| **default(shared)** | Makes all variables shared by default | When most variables should be accessible by all threads |
-| **shared** | Explicitly makes variables shared among threads | Data that all threads need to read or modify |
-| **private** | Creates a thread-local copy of variables | Loop iteration variables, temporary work buffers |
-| **firstprivate** | Thread-local copy initialized from original | When threads need their own initialized copy |
-| **lastprivate** | Final value from logical last iteration copied out | When final result from last iteration is needed |
-| **threadprivate** | Persistent thread-local storage | Thread-specific data that persists between regions |
+## 📊 OpenMP Data Sharing and Variable Scoping
 
-This demo illustrates these concepts by:
-- Showing race conditions with shared variables
-- Demonstrating proper protection with atomic operations
-- Comparing performance implications of different sharing strategies
-- Visualizing memory layouts with shared and private variables
+The following diagram illustrates how variables with different data sharing attributes are handled in OpenMP:
+
+![OpenMP Data Sharing](./assets/openmp_data_sharing.png)
+
+## 🧩 Key Data Sharing Clauses
+
+### 1. `shared`
+
+Variables declared as `shared` are accessible by all threads in the team. Changes made by one thread are visible to other threads.
+
+```cpp
+int count = 0;
+#pragma omp parallel shared(count)
+{
+    // All threads access the same copy of count
+    count++;  // Potential race condition!
+}
+```
+
+### 2. `private`
+
+Each thread gets its own uninitialized copy of the variable.
+
+```cpp
+int var = 10;
+#pragma omp parallel private(var)
+{
+    // Each thread has its own copy of var (uninitialized)
+    var = omp_get_thread_num();  // Safe, each thread modifies its own copy
+}
+// var retains its original value after the parallel region
+```
+
+### 3. `firstprivate`
+
+Similar to `private`, but each thread's copy is initialized with the value from the master thread.
+
+```cpp
+int var = 10;
+#pragma omp parallel firstprivate(var)
+{
+    // Each thread has its own copy of var initialized to 10
+    var += omp_get_thread_num();  // Safe modification
+}
+// var retains its original value after the parallel region
+```
+
+### 4. `lastprivate`
+
+Each thread has its own copy, and the value from the last iteration or section is copied back to the original variable.
+
+```cpp
+int var;
+#pragma omp parallel for lastprivate(var)
+for (int i = 0; i < 100; i++) {
+    var = i;  // Safe, thread-local
+}
+// var now equals 99 (the value from the last iteration)
+```
+
+### 5. `threadprivate`
+
+Global or static variables that maintain their values between parallel regions within the same thread.
+
+```cpp
+int thread_id;
+#pragma omp threadprivate(thread_id)
+
+#pragma omp parallel
+{
+    thread_id = omp_get_thread_num();
+}
+// Each thread now has its own persistent copy of thread_id
+
+#pragma omp parallel
+{
+    // thread_id value from previous parallel region is preserved
+    printf("Thread %d has thread_id = %d\n", omp_get_thread_num(), thread_id);
+}
+```
+
+### 6. `default(shared|none)`
+
+Sets the default data-sharing attribute for all variables in the parallel region.
+
+```cpp
+// All variables referenced in the parallel region must be explicitly scoped
+#pragma omp parallel default(none) shared(a) private(b)
+{
+    // Code that uses a and b
+}
+```
+
+## 💻 Examples in This Project
+
+This project includes the following examples:
+
+1. **Basic Data Sharing**: Demonstrates the differences between `shared`, `private`, and `firstprivate`
+2. **Race Conditions**: Shows how race conditions occur and how to prevent them
+3. **Thread-Private Variables**: Illustrates the use of `threadprivate` for persistent thread-local storage
+4. **Default Clause**: Demonstrates the use of `default(none)` for safer parallel programming
+
+## 🚀 Running the Examples
+
+Use the provided scripts to configure, build, and run the examples:
+
+1. Run `configure.bat` to set up the CMake project
+2. Run `build_all.bat` to compile all examples
+3. Run `run.bat` to execute the examples
+
+Example usage:
+
+```bash
+run.bat --debug --example race_condition
+```
+
+## 🔍 Common Pitfalls
+
+1. **Race Conditions**: Multiple threads modifying the same shared variable without synchronization
+2. **Uninitialized Private Variables**: Forgetting that `private` variables are uninitialized
+3. **Incorrect Scoping**: Using the wrong data-sharing clause for a variable
+4. **Hidden Sharing**: Unintentional sharing of variables in nested function calls
+5. **Array Elements**: Not properly scoping array elements in loops
+
+## 📚 Additional Resources
+
+- [OpenMP Data Sharing Attributes](https://www.openmp.org/spec-html/5.0/openmpsu26.html)
+- [OpenMP Data Scoping Tutorial](https://www.openmp.org/wp-content/uploads/openmp-examples-4.5.0.pdf)
+- [Race Condition Prevention Guide](https://hpc-tutorials.llnl.gov/openmp/data_scope/)
 
 ## Prerequisites
 
